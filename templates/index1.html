@@ -33,61 +33,58 @@
   <script>
     const dfMessenger = document.querySelector('df-messenger');
 
-        function launchChatWithID(houseID) {
-          const dfMessenger = document.querySelector('df-messenger');
+      const metadata = {
+        'working_document_id': 'F0351101',
+      };
 
-          console.log("Launching chat with house ID:", houseID);
-
-          dfMessenger.setAttribute('session-params', JSON.stringify({
-            working_document_id: houseID
-          }));
-
-          console.log("Session parameters set:", {
-            working_document_id: houseID
-          });
-        }
+      dfMessenger.setContext(metadata);
+      console.log("Metadata context set:", metadata);
 
     function addRichContent(customPayload) {
-        console.log('Function addRichContent called');
+      console.log('Function addRichContent called');
 
-        try {
-            console.log('Rendering rich content:', customPayload);
-            dfMessenger.renderCustomCard(customPayload.richContent);
-            return Promise.resolve({ status: "OK", reason: null });
-        } catch (error) {
-            console.error("Error rendering rich content:", error);
-            return Promise.resolve({ status: "ERROR", reason: error.message });
-        }
+      try {
+        console.log('Rendering rich content:', customPayload);
+        dfMessenger.renderCustomCard(customPayload.richContent);
+        return Promise.resolve({ status: "OK", reason: null });
+      } catch (error) {
+        console.error("Error rendering rich content:", error);
+        return Promise.resolve({ status: "ERROR", reason: error.message });
+      }
     }
+
     const toolId = 'projects/convai--core--dev--9a/locations/global/agents/4b651062-f618-4ded-8f67-8c66073f83dd/tools/addRichContent';
     dfMessenger.registerClientSideFunction(toolId, addRichContent.name, addRichContent);
 
-    window.addEventListener('df-chat-open-changed', (event) => {
-      console.log("Listening for chat open/close events...");
-      console.log(`Chat is ${event.detail.isOpen ? 'open' : 'closed'}`);
+        window.addEventListener('df-chat-open-changed', (event) => {
+          console.log("Listening for chat open/close events...");
+          console.log(`Chat is ${event.detail.isOpen ? 'open' : 'closed'}`);
 
-      if (event.detail.isOpen && !sessionStorage.getItem("df-messenger-messages")) {
-        dfMessenger.renderCustomText("Selecciona uno de los roles de abajo 👇");
-
-        const chipsPayload = {
-          richContent: [
-            {
-              type: "chips",
-              options: [
+          if (event.detail.isOpen && !sessionStorage.getItem("df-messenger-messages")) {
+            dfMessenger.renderCustomText("Selecciona uno de los roles de abajo 👇", {});
+            const chipsPayload = {
+              richContent: [
                 {
-                  text: "investor"
-                },
-                {
-                  text: "individual"
+                  type: "chips",
+                  options: [
+                    {
+                      text: "investor"
+                    },
+                    {
+                      text: "individual"
+                    }
+                  ]
                 }
               ]
-            }
-          ]
-        };
-        launchChatWithID('F0351101')
-        addRichContent(chipsPayload);
-      }
-    });
+            };
+            addRichContent(chipsPayload);
+          }
+        });
+    working_document_id = "F0351101"
+    dfMessenger.addEventListener('df-request-sent', function (event) {
+          console.log(event.detail.requestBody.queryInput.text.text)
+        event.detail.requestBody.queryInput.text.text = `${event.detail.requestBody.queryInput.text.text} working_document_id = ${working_document_id}`
+        });
     document.addEventListener('df-chip-clicked', (event) => {
       console.log("Chip clicked event received:", event);
       const clickedChipText = event.detail.text;
