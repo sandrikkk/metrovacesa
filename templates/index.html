@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dialogflow CX Chatbot Integration</title>
+
+  <link rel="stylesheet" href="https://www.gstatic.com/dialogflow-console/fast/df-messenger/prod/v1/themes/df-messenger-default.css">
+
+  <script src="https://www.gstatic.com/dialogflow-console/fast/df-messenger/prod/v1/df-messenger.js"
+    onload="document.dispatchEvent(new Event('df-loaded')); document.dfLoaded = true;"></script>
+  <style>
+    df-messenger {
+      z-index: 999;
+      position: fixed;
+      bottom: 16px;
+      right: 16px;
+    }
+  </style>
+</head>
+<body>
+  <df-messenger
+    oauth-client-id="658908921062-hmmd94e2gtdtegtviri860nteoo2vaku.apps.googleusercontent.com"
+    project-id="convai--core--dev--9a"
+    agent-id="4b651062-f618-4ded-8f67-8c66073f83dd"
+    language-code="es"
+    max-query-length="-1">
+    <df-messenger-chat-bubble
+      chat-title="metrovacesa-test">
+    </df-messenger-chat-bubble>
+  </df-messenger>
+
+  <script>
+    window.addEventListener('df-chat-open-changed', (event) => {
+      console.log(`Chat is ${event.detail.isOpen ? 'open' : 'closed'}`);
+
+      if (event.detail.isOpen && !sessionStorage.getItem("df-messenger-messages")) {
+        const dfMessenger = document.querySelector('df-messenger');
+
+        dfMessenger.renderCustomText("Selecciona uno de los roles de abajo 👇");
+
+        const chipsPayload = [
+          {
+            type: "chips",
+            options: [
+              {
+                text: "investor"
+              },
+              {
+                text: "individual"
+              }
+            ]
+          }
+        ];
+        dfMessenger.renderCustomCard(chipsPayload);
+      }
+    });
+
+    document.addEventListener('df-chip-clicked', (event) => {
+      console.log("Chip clicked event received:", event);
+      const clickedChipText = event.detail.text;
+
+      const email = 'example@example.com';
+
+      const userData = {
+        email: email,
+        role: clickedChipText
+      };
+
+      fetch('/save-user-data', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(userData)
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log(data.message);
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+      });
+    });
+  </script>
+</body>
+</html>
