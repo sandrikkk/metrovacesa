@@ -32,13 +32,6 @@
 <script>
   const dfMessenger = document.querySelector('df-messenger');
 
-  const metadata = {
-    working_document_id: 'F0351101',
-  };
-
-  dfMessenger.setContext(metadata);
-  console.log("Metadata context set:", metadata);
-
   function addRichContent(customPayload) {
     console.log('Rendering rich content:', customPayload);
     try {
@@ -80,11 +73,14 @@
     }
   });
 
-  const working_document_id = "CAN3";
+    const url = 'https://www.idealista.com/obra-nueva/96315058/?id=CAN3';
+    const urlObj = new URL(url);
+    const id = urlObj.searchParams.get('id');
+
 
   dfMessenger.addEventListener('df-request-sent', function (event) {
     const queryText = event.detail.requestBody.queryInput.text.text;
-    event.detail.requestBody.queryInput.text.text = `${queryText} working_document_id = ${working_document_id}`;
+    event.detail.requestBody.queryInput.text.text = `${queryText} working_document_id = ${id}`;
     console.log(event.detail.requestBody.queryInput.text.text);
   });
 
@@ -92,7 +88,6 @@ document.addEventListener('df-button-clicked', (event) => {
   console.log("Button clicked event received:", event);
   const clickedButtonText = event.detail.text;
 
-  // Use sessionStorage to store role and budget, ensuring both are available before sending data
   let role = sessionStorage.getItem('role') || '';
   let budget = sessionStorage.getItem('budget') || '';
 
@@ -132,8 +127,8 @@ document.addEventListener('df-button-clicked', (event) => {
   }
 
   if (clickedButtonText === "> $100000" || clickedButtonText === "< $50000" || clickedButtonText === "< $20000") {
-    budget = clickedButtonText;  // Capture the budget choice
-    sessionStorage.setItem('budget', budget);  // Save budget in sessionStorage
+    budget = clickedButtonText;
+    sessionStorage.setItem('budget', budget);
 
     setTimeout(() => {
       dfMessenger.renderCustomText("Gracias por proporcionar su información, ¿en qué puedo asistirle hoy?");
