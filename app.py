@@ -16,10 +16,12 @@ def save_user_data():
     data = request.json
     email = data.get('email')
     role = data.get('role')
+    budget = data.get('budget')
 
     new_data = pd.DataFrame({
         'Email': [email],
-        'Role': [role]
+        'Role': [role],
+        'Budget': [budget]
     })
     if os.path.exists(file_path):
         existing_data = pd.read_excel(file_path)
